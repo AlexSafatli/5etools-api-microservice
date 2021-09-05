@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx_5etools_api
+    volumes:
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "5300:80"
+    depends_on:
+      - 5etools-api
+  5etools-api:
+    image: 5etools-api:dev
+    build: .
+    env_file:
+      - .env
+    command: >
+      gunicorn -b 0.0.0.0:5300
+      --access-logfile -
+      --reload
+      5etools:app
+    expose:
+      - "5300"
+    volumes:
+      - ./:/app
