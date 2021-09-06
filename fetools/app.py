@@ -3,9 +3,9 @@ from http import HTTPStatus
 from flask import Flask, jsonify
 from marshmallow.exceptions import ValidationError
 
-from connections.config import Config
-from connections.extensions import cors, ma
-from connections.views import blueprint
+from fetools.config import Config
+from fetools.extensions import cors, ma
+from fetools.views import blueprint
 
 
 def create_app(config_object=Config):

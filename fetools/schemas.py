@@ -1,4 +1,4 @@
-from connections.extensions import ma
+from fetools.extensions import ma
 
 
 class BaseModelSchema(ma.ModelSchema):
