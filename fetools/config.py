@@ -1,5 +1,8 @@
+from os import environ
+
+
 class Config(object):
-    pass
+    FETOOLS_JSON_ROOT_PATH = environ.get('FETOOLS_JSON_ROOT_PATH', './jsons')
 
 
 class TestConfig(Config):

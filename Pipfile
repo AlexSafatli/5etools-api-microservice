@@ -11,6 +11,7 @@ marshmallow = "==3.13.0"
 marshmallow-enum = "==1.5.1"
 webargs = "==8.0.1"
 flask = "==2.0.1"
+ijson = "==3.1.4"
 
 [dev-packages]
 "flake8" = "==3.9.2"

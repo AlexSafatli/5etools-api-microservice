@@ -1,3 +1,3 @@
 from flask import Blueprint
 
-blueprint = Blueprint('5etools', __name__)
+blueprint = Blueprint('fetools', __name__)
