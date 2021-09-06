@@ -121,3 +121,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# JSON folder (do not want to distribute 5etools JSONs)
+jsons/

@@ -3,19 +3,39 @@ import typing
 import os
 
 
+IGNORED_SUBDIRS = ['roll20-module', 'generated']
+IGNORED_PREFIXES = ['roll20', 'foundry', 'changelog', 'renderdemo']
+
+
 class FetoolsLibrary(object):
 
-    def __init__(self, json_path):
+    def __init__(self, json_path: str):
         self.json_root_path: str = json_path
-        self.json_file_paths: typing.List[FetoolsJsonFile] = []
+        self.json_file_paths: typing.Dict[str,
+                                          typing.List[FetoolsJsonFile]] = {}
+
+    def _search(self, root_path):
+        found_files: typing.List[FetoolsJsonFile] = []
+        for _, dirs, files in os.walk(root_path):
+            for f in files:
+                ignored = False
+                for prefix in IGNORED_PREFIXES:
+                    if f.startswith(prefix):
+                        ignored = True
+                        break
+                if ignored:
+                    continue
+                if f.endswith('json'):
+                    _f: str = os.path.join(root_path, f)
+                    found_files.append(FetoolsJsonFile(f, _f))
+            for d in dirs:
+                if os.path.basename(d) in IGNORED_SUBDIRS:
+                    continue
+                self._search(d)
+        self.json_file_paths[root_path] = found_files
 
     def search(self):
-        found_files: typing.List[FetoolsJsonFile] = []
-        for f in os.listdir(self.json_root_path):
-            if f.endswith('.json'):
-                f_path = os.path.join(self.json_root_path, f)
-                found_files.append(FetoolsJsonFile(f, f_path))
-        self.json_file_paths = found_files
+        self._search(self.json_root_path)
 
 
 class FetoolsJsonFile(object):
