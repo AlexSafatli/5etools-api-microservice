@@ -13,9 +13,12 @@ class FetoolsLibrary(object):
         self.json_root_path: str = json_path
         self.json_file_paths: typing.Dict[str,
                                           typing.List[FetoolsJsonFile]] = {}
+        self.json_file_names: typing.List[str] = []
 
     def _search(self, root_path):
+        subpath = root_path[len(self.json_root_path):]
         found_files: typing.List[FetoolsJsonFile] = []
+        found_file_names: typing.List[str] = []
         for _, dirs, files in os.walk(root_path):
             for f in files:
                 ignored = False
@@ -28,11 +31,13 @@ class FetoolsLibrary(object):
                 if f.endswith('json'):
                     _f: str = os.path.join(root_path, f)
                     found_files.append(FetoolsJsonFile(f, _f))
+                    found_file_names.append(os.path.join(subpath,
+                                                         os.path.basename(f)))
             for d in dirs:
-                if os.path.basename(d) in IGNORED_SUBDIRS:
-                    continue
-                self._search(d)
-        self.json_file_paths[root_path] = found_files
+                if not os.path.basename(d) in IGNORED_SUBDIRS:
+                    self._search(d)
+        self.json_file_paths[subpath] = found_files
+        self.json_file_names.extend(found_file_names)
 
     def search(self):
         self._search(self.json_root_path)
