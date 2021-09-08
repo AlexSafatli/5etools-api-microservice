@@ -7,6 +7,25 @@ IGNORED_SUBDIRS = ['roll20-module', 'generated']
 IGNORED_PREFIXES = ['roll20', 'foundry', 'changelog', 'renderdemo']
 
 
+class FetoolsJsonFile(object):
+
+    def __init__(self, name: str, json_path: str):
+        self.name: str = name
+        self.json_file_path: str = json_path
+        self.json_file_handle = None
+
+    def _read(self):
+        if self.json_file_handle is not None:
+            self.json_file_handle.close()
+        self.json_file_handle = open(self.json_file_path)
+
+    def __getitem__(self, item):
+        if item is None:
+            return None
+        self._read()
+        return ijson.kvitems(self.json_file_handle, item + '.item')
+
+
 class FetoolsLibrary(object):
 
     def __init__(self, json_path: str):
@@ -47,22 +66,15 @@ class FetoolsLibrary(object):
     def modules(self) -> typing.List[str]:
         return list(self.json_file_paths.keys())
 
-
-class FetoolsJsonFile(object):
-
-    def __init__(self, name: str, json_path: str):
-        self.name: str = name
-        self.json_file_path: str = json_path
-        self.json_file_handle = None
-        self.json_meta_obj = None
-
-    def _read(self):
-        if self.json_file_handle is None:
-            self.json_file_handle = open(self.json_file_path)
-            self.json_meta_obj = ijson.items(self.json_file_handle, '_meta')
-
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> FetoolsJsonFile:
         if item is None:
-            return None
-        self._read()
-        return ijson.kvitems(self.json_file_handle, item)
+            return FetoolsJsonFile('', '')
+        path = os.path.split(item)
+        if len(path) == 1:
+            li = self.json_file_paths['']
+        else:
+            li = self.json_file_paths[path[0]]
+        for fi in li:
+            if fi.name == item + '.json':
+                return fi
+        return FetoolsJsonFile('', '')
