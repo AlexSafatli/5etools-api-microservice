@@ -16,7 +16,6 @@ class FetoolsLibrary(object):
         self.json_file_names: typing.List[str] = []
 
     def _search(self, root_path):
-        subpath = root_path[len(self.json_root_path):]
         found_files: typing.List[FetoolsJsonFile] = []
         found_file_names: typing.List[str] = []
         for _, dirs, files in os.walk(root_path):
@@ -31,16 +30,22 @@ class FetoolsLibrary(object):
                 if f.endswith('json'):
                     _f: str = os.path.join(root_path, f)
                     found_files.append(FetoolsJsonFile(f, _f))
-                    found_file_names.append(os.path.join(subpath,
+                    found_file_names.append(os.path.join(root_path,
                                                          os.path.basename(f)))
             for d in dirs:
                 if not os.path.basename(d) in IGNORED_SUBDIRS:
                     self._search(d)
-        self.json_file_paths[subpath] = found_files
+        if root_path == self.json_root_path:
+            self.json_file_paths[''] = found_files
+        else:
+            self.json_file_paths[root_path] = found_files
         self.json_file_names.extend(found_file_names)
 
-    def search(self):
+    def search(self) -> None:
         self._search(self.json_root_path)
+
+    def modules(self) -> typing.List[str]:
+        return list(self.json_file_paths.keys())
 
 
 class FetoolsJsonFile(object):
@@ -49,10 +54,12 @@ class FetoolsJsonFile(object):
         self.name: str = name
         self.json_file_path: str = json_path
         self.json_file_handle = None
+        self.json_meta_obj = None
 
     def _read(self):
         if self.json_file_handle is None:
             self.json_file_handle = open(self.json_file_path)
+            self.json_meta_obj = ijson.items(self.json_file_handle, '_meta')
 
     def __getitem__(self, item):
         if item is None:
