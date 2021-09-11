@@ -18,7 +18,8 @@ def test_json_file():
     assert len(items.name) > 0 and items.name == 'items.json'
 
     item_found = False
-    item_kvs = items['item']
+    assert items.json_root_key == 'item'
+    item_kvs = items[items.json_root_key]
     item_names = (v for k, v in item_kvs if k == 'name')
     for name in item_names:
         assert len(name) > 0
