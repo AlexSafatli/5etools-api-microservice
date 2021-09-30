@@ -77,6 +77,7 @@ class FetoolsLibrary(object):
     def search(self) -> None:
         self._search(self.json_root_path)
 
+    @property
     def modules(self) -> typing.List[str]:
         return list(self.json_file_paths.keys())
 

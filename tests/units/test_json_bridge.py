@@ -7,7 +7,7 @@ def test_json_library():
     library.search()
 
     assert len(library.json_file_paths) > 0
-    assert 'class' in library.modules()
+    assert 'class' in library.modules
 
 
 def test_json_file():
